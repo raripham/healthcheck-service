@@ -1,3 +1,6 @@
 DB_URL=postgres://postgres:changeme@localhost:5433/healthcheck?sslmode=disable
 
 INTERVAL=2
+
+
+TOKEN=eyJhbGciOiJFUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjM2MDAwMDAwMDAwMDAsImlzcyI6ImlzIiwic3ViIjoiNTE1MSJ9.X9znAANseGWiMsP6rih3OBYd8Id_jaIYEyO0uefviUNtx3l_DwV7e_t8eTjJz5BMCn0lq

@@ -5,6 +5,8 @@ import (
 	"log"
 	"net/http"
 
+	middlewares "healthcheck/routes/middlewares"
+
 	"github.com/gin-gonic/gin"
 
 	"healthcheck/entities"
@@ -14,6 +16,7 @@ import (
 )
 
 func Config(db *sql.DB) *gin.Engine {
+
 	r := gin.Default()
 	r.Use(gin.Recovery())
 	// r.Use(middlewares.AccessHandleFunc())
@@ -27,8 +30,15 @@ func Config(db *sql.DB) *gin.Engine {
 
 		backend.GET("/:service", func(c *gin.Context) {
 			service := c.Param("service")
-
-			c.IndentedJSON(http.StatusOK, entities.ServiceState(db, service))
+			bearerToken := c.Request.Header.Get("Authorization")
+			if middlewares.AuthorizeJWT(bearerToken) {
+				c.IndentedJSON(http.StatusOK, entities.ServiceState(db, service))
+			} else {
+				c.JSON(http.StatusUnauthorized, gin.H{
+					"message": "unauthorized",
+				})
+			}
+			// c.IndentedJSON(http.StatusOK, entities.ServiceState(db, service))
 		})
 
 		backend.GET("", func(c *gin.Context) {

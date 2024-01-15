@@ -14,7 +14,7 @@ import (
 )
 
 func main() {
-	middlewares.generateJWT()
+	// middlewares.generateJWT()
 	db, err := database.OpenDB()
 	if err != nil {
 		log.Printf("Databse Connection Error", err)

@@ -6,6 +6,7 @@ import (
 	"healthcheck/model"
 	"log"
 	"net/http"
+	"os"
 	"strings"
 	"time"
 
@@ -48,14 +49,31 @@ func ServiceRegister(db *sql.DB, svc model.AddRequest) string {
 
 func ServiceUpdateState(db *sql.DB) gin.HandlerFunc {
 	var rsp []model.ListRequest
-
+	secretToken := os.Getenv("TOKEN")
 	return func(c *gin.Context) {
 		service := c.Param("service")
 		bearerToken := c.Request.Header.Get("Authorization")
 		reqToken := strings.Split(bearerToken, " ")[1]
-		// check exist
 		rsp = ServiceState(db, service)
 		if rsp != nil {
+			// ServiceRegister(db, )
+		}
+		if reqToken != secretToken {
+			c.JSON(http.StatusUnauthorized, gin.H{
+				"message": "unauthorized",
+			})
+
+		} else {
+
+		}
+
+		var requestBody model.AddRequest
+		if err := c.BindJSON(&requestBody); err != nil {
+			log.Fatal(err)
+		}
+		// check exist
+
+		if rsp != nil && reqToken == secretToken {
 			if rsp[0].State == "Down" {
 				startTime := time.Now()
 				_, err := db.Query(`UPDATE services SET status = 'Up', start_time = $1 WHERE service_name = $2;`, startTime, service)
@@ -76,6 +94,8 @@ func ServiceUpdateState(db *sql.DB) gin.HandlerFunc {
 			}
 			// return "Update Status OK!"
 			c.IndentedJSON(http.StatusOK, "Update Status OK!")
+		} else if rsp != nil && reqToken == secretToken {
+
 		} else {
 			// return "service hasn't been registerd"
 			c.IndentedJSON(http.StatusOK, "service hasn't been registerd")
