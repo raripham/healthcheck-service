@@ -17,7 +17,7 @@ func Mapper(data *sql.Rows) []model.ListRequest {
 	var svcs []model.ListRequest
 	for data.Next() {
 		var a model.ListRequest
-		err := data.Scan(&a.Id, &a.ServiceName, &a.State, &a.StartTime, &a.EndTime, &a.UpTime, &a.Metadata)
+		err := data.Scan(&a.Id, &a.ServiceName, &a.State, &a.StartTime, &a.EndTime, &a.UpTime, &a.NodeId, &a.Metadata)
 		if err != nil {
 			log.Fatal(err)
 		}

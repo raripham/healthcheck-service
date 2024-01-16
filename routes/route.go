@@ -5,8 +5,6 @@ import (
 	"log"
 	"net/http"
 
-	middlewares "healthcheck/routes/middlewares"
-
 	"github.com/gin-gonic/gin"
 
 	"healthcheck/entities"
@@ -28,18 +26,22 @@ func Config(db *sql.DB) *gin.Engine {
 			c.JSON(http.StatusOK, "OK")
 		})
 
-		backend.GET("/:service", func(c *gin.Context) {
-			service := c.Param("service")
-			bearerToken := c.Request.Header.Get("Authorization")
-			if middlewares.AuthorizeJWT(bearerToken) {
-				c.IndentedJSON(http.StatusOK, entities.ServiceState(db, service))
-			} else {
-				c.JSON(http.StatusUnauthorized, gin.H{
-					"message": "unauthorized",
-				})
-			}
-			// c.IndentedJSON(http.StatusOK, entities.ServiceState(db, service))
-		})
+		backend.GET("/getall", entities.GetAllServiceTest(db))
+		backend.GET("/:service_id", entities.GetServiceByIdTest(db))
+		backend.POST("/register", entities.ServiceUpdateInfoTest(db))
+
+		// backend.GET("/:service", func(c *gin.Context) {
+		// 	service := c.Param("service")
+		// 	bearerToken := c.Request.Header.Get("Authorization")
+		// 	if middlewares.AuthorizeJWT(bearerToken) {
+		// 		c.IndentedJSON(http.StatusOK, entities.ServiceState(db, service))
+		// 	} else {
+		// 		c.JSON(http.StatusUnauthorized, gin.H{
+		// 			"message": "unauthorized",
+		// 		})
+		// 	}
+		// 	// c.IndentedJSON(http.StatusOK, entities.ServiceState(db, service))
+		// })
 
 		backend.GET("", func(c *gin.Context) {
 			c.IndentedJSON(http.StatusOK, entities.ListAllService(db))
@@ -53,7 +55,7 @@ func Config(db *sql.DB) *gin.Engine {
 			c.IndentedJSON(http.StatusOK, entities.ServiceRegister(db, requestBody))
 		})
 
-		backend.GET("/:service/up", entities.ServiceUpdateState(db))
+		// backend.GET("/:service/up", entities.ServiceUpdateState(db))
 
 		// backend.GET("/:service/down", func(c *gin.Context) {
 		// 	service := c.Param("service")
